@@ -29,6 +29,7 @@
 
 from __future__ import annotations
 import os
+import json
 import time
 import importlib
 from typing import Any, Dict, List
@@ -98,11 +99,43 @@ def run_pipeline(
     # Ensure logs directory exists to store stage-specific logs
     os.makedirs("logs", exist_ok=True)
 
+    # === Resume and caching configuration ===
+    cache_dir = pipeline_config.get("cache_dir", "pipeline_cache")
+    resume_enabled = pipeline_config.get("resume", False)
+    reset_cache = pipeline_config.get("reset_cache", False)
+    os.makedirs(cache_dir, exist_ok=True)
+    state_file = os.path.join(cache_dir, "state.json")
+
+    if reset_cache and os.path.exists(state_file):
+        logger.info("Resetting pipeline cache state.")
+        os.remove(state_file)
+
+    last_completed_stage = None
+    if resume_enabled and os.path.exists(state_file):
+        try:
+            with open(state_file, "r", encoding="utf-8") as f:
+                last_completed_stage = json.load(f).get("last_completed_stage")
+            if last_completed_stage:
+                logger.info(f"Resuming pipeline from stage after '{last_completed_stage}'.")
+        except Exception as e:
+            logger.warning(f"Failed to read state file '{state_file}': {e}")
+
     # Record overall pipeline start
     pipeline_execution_start_time: float = time.time()
 
+    # Determine which stages to run based on resume information
+    if resume_enabled and last_completed_stage in DEFAULT_STAGE_ORDER:
+        start_index = DEFAULT_STAGE_ORDER.index(last_completed_stage) + 1
+        stages_to_run = DEFAULT_STAGE_ORDER[start_index:]
+    else:
+        stages_to_run = DEFAULT_STAGE_ORDER
+
+    if resume_enabled and not stages_to_run:
+        logger.info("All pipeline stages already completed. Nothing to run.")
+        return
+
     # === Execute pipeline stages in the fixed default order ===
-    for stage_name in DEFAULT_STAGE_ORDER:
+    for stage_name in stages_to_run:
         # Check if the stage is mentioned in the pipeline config at all
         if stage_name not in pipeline_config:
             logger.debug(f"Stage '{stage_name}' is not mentioned in the config. Skipping.")
@@ -152,8 +185,19 @@ def run_pipeline(
         })
         logger.success(f"Completed stage: '{stage_name}' in {elapsed_time:.3f}s")
 
+        if resume_enabled:
+            try:
+                with open(state_file, "w", encoding="utf-8") as f:
+                    json.dump({"last_completed_stage": stage_name}, f)
+            except Exception as e:
+                logger.warning(f"Failed to update state file '{state_file}': {e}")
+
     # Record overall pipeline end
     pipeline_execution_end_time: float = time.time()
+
+    if resume_enabled and os.path.exists(state_file):
+        os.remove(state_file)
+        logger.info("Pipeline completed. State file removed.")
 
     # Check for unrecognized stages in config
     _check_for_unrecognized_stages(pipeline_config)

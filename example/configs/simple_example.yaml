@@ -1,12 +1,15 @@
 hf_configuration:
-  hf_dataset_name: yourbench_example # change this to your desired dataset name
-  private: false # change this to true if you want to make the dataset private. it's true by default.
+  hf_dataset_name: yourbench_example
+  private: false
 
 model_list:
   - model_name: Qwen/Qwen3-30B-A3B
     provider: fireworks-ai
 
 pipeline:
+  resume: true
+  cache_dir: pipeline_cache
+  reset_cache: false
   ingestion:
     source_documents_dir: example/data/raw
     output_dir: example/data/processed
