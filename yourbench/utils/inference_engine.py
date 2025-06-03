@@ -19,6 +19,7 @@ from loguru import logger
 from tqdm.asyncio import tqdm_asyncio
 
 from huggingface_hub import AsyncInferenceClient
+from .ollama_client import AsyncOllamaClient
 
 
 load_dotenv()
@@ -46,6 +47,9 @@ class Model:
     def __post_init__(self):
         if self.api_key is None:
             self.api_key = os.getenv("HF_TOKEN", None)
+        if self.provider == "ollama" and self.base_url is None:
+            # Default base URL for local Ollama server
+            self.base_url = "http://localhost:11434/v1"
 
 
 @dataclass
@@ -189,14 +193,22 @@ async def _get_response(model: Model, inference_call: InferenceCall) -> str:
 
     request_id = str(uuid.uuid4())
 
-    client = AsyncInferenceClient(
-        base_url=model.base_url,
-        api_key=model.api_key,
-        provider=model.provider,
-        bill_to=model.bill_to,
-        timeout=GLOBAL_TIMEOUT,
-        headers={"X-Request-ID": request_id},
-    )
+    if model.provider == "ollama":
+        client = AsyncOllamaClient(
+            base_url=model.base_url,
+            api_key=model.api_key,
+            timeout=GLOBAL_TIMEOUT,
+            headers={"X-Request-ID": request_id},
+        )
+    else:
+        client = AsyncInferenceClient(
+            base_url=model.base_url,
+            api_key=model.api_key,
+            provider=model.provider,
+            bill_to=model.bill_to,
+            timeout=GLOBAL_TIMEOUT,
+            headers={"X-Request-ID": request_id},
+        )
 
     logger.debug(f"Making request with ID: {request_id}")
 
