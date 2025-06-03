@@ -76,6 +76,13 @@ model_list:
     max_concurrent_requests: 128
     # This is good if you want to batch many requests and your system can handle it.
 
+  # 2b) Using a local Ollama server
+  - model_name: llama3
+    provider: ollama
+    base_url: http://localhost:11434/v1
+    api_key: null
+    max_concurrent_requests: 1
+
   # 3) Using an OpenAI model:
   - model_name: gpt-4.1
     base_url: https://api.openai.com/v1
