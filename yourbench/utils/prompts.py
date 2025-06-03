@@ -553,3 +553,42 @@ naturally and eliminates redundancy.
 </chunk_summaries>
 
 Return ONLY the final text inside <final_summary> tags."""
+
+FINREG_CODE_GEN_PROMPT = """
+You are an expert Python developer and financial regulations analyst. Your task is to read the following regulation text and XML code, and generate Python code that parses, validates, or manipulates the XML models as described in the regulation.
+
+<regulation_text>
+{regulation_text}
+</regulation_text>
+
+<xml_model>
+{xml_code}
+</xml_model>
+
+Instructions:
+- Write Python code that implements the requirements or operations described in the regulation.
+- Use standard libraries (e.g., xml.etree.ElementTree) or any specified libraries.
+- Add comments explaining each major step.
+- If multiple operations are required, structure the code into functions.
+
+Output your code inside <output_code> tags.
+"""
+
+FINREG_JSON_GEN_PROMPT = """
+You are an expert in financial data modeling. Given the following regulation text and XML code, produce a JSON object that captures the required data structure, constraints, or operations as described.
+
+<regulation_text>
+{regulation_text}
+</regulation_text>
+
+<xml_model>
+{xml_code}
+</xml_model>
+
+Instructions:
+- The JSON should reflect the information model, constraints, or mappings required by the regulation.
+- Use clear keys and values, and include nested structures if needed.
+- If the regulation describes operations, encode them as JSON fields or objects.
+
+Output your JSON inside <output_json> tags.
+"""
