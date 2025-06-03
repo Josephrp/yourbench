@@ -54,6 +54,8 @@ hf_configuration:
   # Example:
   # local_dataset_dir: /some/path
   # local_saving: false
+  # backup_dataset_dir: ./backup
+  backup_dataset_dir: ./backup
 
 # ==============================================================================
 # MODEL CONFIGURATION
@@ -141,6 +143,9 @@ model_roles:
 # will execute that stage, while "run: false" will skip it. 
 # For each stage, you can define additional parameters that fine-tune behavior.
 pipeline:
+  resume: true
+  cache_dir: pipeline_cache
+  reset_cache: false
 
   # 1) INGESTION
   # Reads raw documents from disk, attempts to convert them to text, normalizes

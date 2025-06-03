@@ -1,4 +1,5 @@
 import os
+import shutil
 from typing import Any, Dict, Optional
 
 from loguru import logger
@@ -301,11 +302,24 @@ def custom_save_dataset(
             # Save the dataset to disk
             local_dataset.save_to_disk(local_dataset_dir)
             logger.success(f"Dataset successfully saved locally to: '{local_dataset_dir}'")
+
+            backup_dir = config.get("backup_dataset_dir") or config.get("hf_configuration", {}).get(
+                "backup_dataset_dir"
+            )
+            if backup_dir:
+                os.makedirs(backup_dir, exist_ok=True)
+                backup_path = os.path.join(backup_dir, os.path.basename(local_dataset_dir))
+                try:
+                    if os.path.exists(backup_path):
+                        shutil.rmtree(backup_path)
+                    shutil.copytree(local_dataset_dir, backup_path)
+                    logger.info(f"Backup dataset copied to: '{backup_path}'")
+                except Exception as e:
+                    logger.warning(f"Failed to copy backup dataset: {e}")
         except PermissionError as e:
             if "dataset can't overwrite itself" in str(e):
                 # Handle the specific error where a dataset can't overwrite itself
                 logger.warning("Dataset can't overwrite itself. Attempting to save with a temporary directory...")
-                import shutil
                 import tempfile
 
                 # Create a temporary directory
