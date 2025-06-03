@@ -19,6 +19,7 @@ from loguru import logger
 from tqdm.asyncio import tqdm_asyncio
 
 from huggingface_hub import AsyncInferenceClient
+from yourbench.utils.vllm_client import chat_completion as vllm_chat_completion
 from .ollama_client import AsyncOllamaClient
 
 
@@ -212,21 +213,37 @@ async def _get_response(model: Model, inference_call: InferenceCall) -> str:
 
     logger.debug(f"Making request with ID: {request_id}")
 
-    response = await client.chat_completion(
-        model=model.model_name,
-        messages=inference_call.messages,
-        temperature=inference_call.temperature,
-        # Note: seed is not directly supported by chat_completion in huggingface_hub client API as of recent versions
-        # It might need to be passed via extra_body if the provider supports it.
-        # seed=inference_call.seed, # This might cause an error if not supported
-    )
+    if model.provider == "vllm":
+        output_content = await vllm_chat_completion(
+            base_url=model.base_url or "",
+            api_key=model.api_key,
+            model=model.model_name,
+            messages=inference_call.messages,
+            temperature=inference_call.temperature,
+            timeout=GLOBAL_TIMEOUT,
+            request_id=request_id,
+        )
+    else:
+        client = AsyncInferenceClient(
+            base_url=model.base_url,
+            api_key=model.api_key,
+            provider=model.provider,
+            bill_to=model.bill_to,
+            timeout=GLOBAL_TIMEOUT,
+            headers={"X-Request-ID": request_id},
+        )
 
-    # Safe-guarding in case the response is missing .choices
-    if not response or not response.choices:
-        logger.warning("Empty response or missing .choices from model {}", model.model_name)
-        raise Exception("Failed Inference")
+        response = await client.chat_completion(
+            model=model.model_name,
+            messages=inference_call.messages,
+            temperature=inference_call.temperature,
+        )
 
-    output_content = response.choices[0].message.content
+        if not response or not response.choices:
+            logger.warning("Empty response or missing .choices from model {}", model.model_name)
+            raise Exception("Failed Inference")
+
+        output_content = response.choices[0].message.content
 
     try:
         encoding = _get_encoding(model.encoding_name)

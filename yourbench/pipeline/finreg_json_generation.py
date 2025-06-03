@@ -1,9 +1,11 @@
-import os
-from typing import Dict, Any
+from typing import Any, Dict
+
 from loguru import logger
+
 from yourbench.utils.prompts import FINREG_JSON_GEN_PROMPT
-from yourbench.utils.inference_engine import InferenceCall, run_inference
 from yourbench.utils.dataset_engine import custom_load_dataset, custom_save_dataset
+from yourbench.utils.inference_engine import InferenceCall, run_inference
+
 
 def run(config: Dict[str, Any]) -> None:
     stage_cfg = config.get("pipeline", {}).get("finreg_json_generation", {})
@@ -39,4 +41,4 @@ def run(config: Dict[str, Any]) -> None:
     # Add generated JSON to dataset
     dataset = dataset.add_column("generated_json", responses)
     custom_save_dataset(dataset, config=config, subset=output_subset)
-    logger.success(f"Saved JSON generation results to subset '{output_subset}'.") 
+    logger.success(f"Saved JSON generation results to subset '{output_subset}'.")
