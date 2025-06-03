@@ -112,7 +112,7 @@ model_roles:
 
   # 'single_shot_question_generation': used for generating straightforward
   # "single-hop" questions from each chunk. Could specify multiple models
-  # if you want an ensemble approach for variety. Each model’s outputs
+  # if you want an ensemble approach for variety. Each model's outputs
   # will be aggregated together by the pipeline.
   single_shot_question_generation:
     - Qwen/Qwen3-30B-A3B
@@ -182,7 +182,7 @@ pipeline:
     chunking_configuration:
       # chunking_mode: fast_chunking   # "fast_chunking" or "semantic_chunking"
       # WARNING: SEMANTIC CHUNKING IS TEMPORARILY REMOVED AFTER v0.3.1. 
-      l_max_tokens: 128              # Each chunk’s maximum token length
+      l_max_tokens: 128              # Each chunk's maximum token length
       token_overlap: 0               # Overlap between chunks in token-based splitting
       encoding_name: cl100k_base     # Tokenizer name for measuring token lengths
 
@@ -199,10 +199,24 @@ pipeline:
       # Tweak these to produce bigger or fewer multi-hop combos or to tighten
       # the chunk boundaries for more finely grained questions.
 
-  # 5) SINGLE_SHOT_QUESTION_GENERATION
+  # 5) FINREG_CODE_GENERATION
+  # Generates Python code from regulation text and XML code in each chunk.
+  finreg_code_generation:
+    run: true
+    source_subset: chunked
+    output_subset: finreg_code
+
+  # 6) FINREG_JSON_GENERATION
+  # Generates JSON objects from regulation text and XML code in each chunk.
+  finreg_json_generation:
+    run: true
+    source_subset: chunked
+    output_subset: finreg_json
+
+  # 7) SINGLE_SHOT_QUESTION_GENERATION
   # Generates single-hop question-answer pairs from each chunk. Typically simpler
-  # factual or direct queries. The model is guided to produce “estimated_difficulty”,
-  # “citations,” etc. 
+  # factual or direct queries. The model is guided to produce "estimated_difficulty",
+  # "citations," etc. 
   single_shot_question_generation:
     run: true
     # You can add global instructions guiding question style, difficulty, domain specificity:
@@ -232,15 +246,15 @@ pipeline:
     #   value: 0.3           # e.g. take 30% of multi-hop chunk combos
     #   random_seed: 42
 
-  # 7) LIGHTEVAL
-  # Combines the single-hop and multi-hop question sets into a unified “lighteval”
+  # 8) LIGHTEVAL
+  # Combines the single-hop and multi-hop question sets into a unified "lighteval"
   # subset, optionally adding chunk context and original document text. Useful for
-  # quick or “lightweight” downstream evaluations.
+  # quick or "lightweight" downstream evaluations.
   lighteval:
     run: true
 
-  # 8) CITATION_SCORE_FILTERING
-  # Finally, runs fuzzy-match scoring on each question’s “citations” vs. the
+  # 9) CITATION_SCORE_FILTERING
+  # Finally, runs fuzzy-match scoring on each question's "citations" vs. the
   # chunk text to see if citations are truly found in the source. Adds columns
   # like 'citation_score' to the final dataset, letting you filter out or down-weight
   # QA pairs with poor grounding.

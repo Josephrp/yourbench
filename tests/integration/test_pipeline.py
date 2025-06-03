@@ -383,3 +383,53 @@ def test_lighteval_stage(mock_config):
         # Verify behavior
         assert mock_load.call_count == 4
         mock_save.assert_called_once()
+
+
+def test_finreg_code_generation_stage(mock_config):
+    """
+    Test the finreg_code_generation stage of the YourBench pipeline.
+    Verifies that code is generated and saved for each document.
+    """
+    from datasets import Dataset
+    mock_dataset = Dataset.from_dict({
+        "regulation_text": ["Regulation 1", "Regulation 2"],
+        "xml_code": ["<xml>1</xml>", "<xml>2</xml>"]
+    })
+    with (
+        patch("yourbench.utils.dataset_engine.custom_load_dataset", return_value=mock_dataset) as mock_load,
+        patch("yourbench.utils.dataset_engine.custom_save_dataset") as mock_save,
+        patch("yourbench.pipeline.finreg_code_generation.run_inference") as mock_run_inference,
+    ):
+        mock_run_inference.return_value = {
+            "fake_model": ["<output_code>code1</output_code>", "<output_code>code2</output_code>"]
+        }
+        from yourbench.pipeline.finreg_code_generation import run
+        run(mock_config)
+        mock_load.assert_called_once()
+        mock_run_inference.assert_called_once()
+        mock_save.assert_called_once()
+
+
+def test_finreg_json_generation_stage(mock_config):
+    """
+    Test the finreg_json_generation stage of the YourBench pipeline.
+    Verifies that JSON is generated and saved for each document.
+    """
+    from datasets import Dataset
+    mock_dataset = Dataset.from_dict({
+        "regulation_text": ["Regulation 1", "Regulation 2"],
+        "xml_code": ["<xml>1</xml>", "<xml>2</xml>"]
+    })
+    with (
+        patch("yourbench.utils.dataset_engine.custom_load_dataset", return_value=mock_dataset) as mock_load,
+        patch("yourbench.utils.dataset_engine.custom_save_dataset") as mock_save,
+        patch("yourbench.pipeline.finreg_json_generation.run_inference") as mock_run_inference,
+    ):
+        mock_run_inference.return_value = {
+            "fake_model": ["<output_json>{}1</output_json>", "<output_json>{}2</output_json>"]
+        }
+        from yourbench.pipeline.finreg_json_generation import run
+        run(mock_config)
+        mock_load.assert_called_once()
+        mock_run_inference.assert_called_once()
+        mock_save.assert_called_once()
