@@ -153,11 +153,13 @@ For each model in the list, you can specify:
   - **Required**: Yes  
   - **Description**: The identifier or name of the model (e.g., `gpt-4o`, `Qwen/Qwen2.5-VL-72B-Instruct`).
 
-- **`provider`**  
-  - **Type**: String  
-  - **Optional**: Yes  
-  - **Default**: `null`  
-  - **Description**: For Hugging Face models, specifies the inference provider (e.g., `hf-inference`, `novita`, `together`). Set to `null` for OpenAI API or OpenAI-compatible endpoints.
+- **`provider`**
+  - **Type**: String
+  - **Optional**: Yes
+  - **Default**: `null`
+  - **Description**: For Hugging Face models, specifies the inference provider (e.g., `hf-inference`, `novita`, `together`).
+    Use `vllm` to target a local [vLLM](https://github.com/vllm-project/vllm) server.
+    Set to `null` for OpenAI API or other OpenAI-compatible endpoints.
 
 - **`api_key`**  
   - **Type**: String  
