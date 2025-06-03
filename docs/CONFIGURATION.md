@@ -143,6 +143,13 @@ model_list:
     base_url: "https://api.anthropic.com/v1"  # Replace with your API endpoint
     api_key: $ANTHROPIC_API_KEY
     max_concurrent_requests: 5
+
+  # Local Ollama server
+  - model_name: llama3
+    provider: ollama
+    base_url: "http://localhost:11434/v1"
+    api_key: null
+    max_concurrent_requests: 1
 ```
 
 ### Options
