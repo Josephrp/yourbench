@@ -114,6 +114,16 @@ local_dataset_dir: /path/to/local/dataset
 local_dataset_dir: /home/user/yourbench_datasets
 ```
 
+### Backup Dataset Directory
+
+You can maintain a redundant copy of your dataset by specifying `backup_dataset_dir`.
+
+```yaml
+backup_dataset_dir: /path/to/backup
+```
+
+When set, every time a dataset is saved locally, a copy will also be written to this directory.
+
 ---
 
 ## Model Settings
@@ -270,10 +280,26 @@ model_roles:
 The `pipeline` section configures the stages of the YourBench workflow. Each stage can be enabled or disabled and includes additional settings specific to its functionality.
 
 ### Common Options for All Stages
-- **`run`**  
-  - **Type**: Boolean  
-  - **Required**: Yes  
+- **`run`**
+  - **Type**: Boolean
+  - **Required**: Yes
   - **Description**: Enables (`true`) or disables (`false`) the stage.
+
+Additionally, the `pipeline` section supports options to resume execution if a
+previous run was interrupted:
+
+- **`resume`**
+  - **Type**: Boolean
+  - **Optional**: Yes
+  - **Description**: Continue from the last successfully completed stage when set to `true`.
+- **`cache_dir`**
+  - **Type**: String
+  - **Optional**: Yes
+  - **Description**: Directory where pipeline progress is stored.
+- **`reset_cache`**
+  - **Type**: Boolean
+  - **Optional**: Yes
+  - **Description**: If `true`, clears any cached pipeline state before running.
 
 ### Ingestion Stage
 

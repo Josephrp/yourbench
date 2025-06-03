@@ -1,11 +1,15 @@
 import os
+import json
 import shutil
 import tempfile
 from unittest.mock import MagicMock, patch
 
 import pytest
 
-from datasets import Dataset
+
+datasets = pytest.importorskip("datasets")  # noqa: E402
+from datasets import Dataset  # noqa: E402
+from yourbench.pipeline.handler import run_pipeline  # noqa: E402
 
 
 # Fixture for temporary directory
@@ -437,3 +441,35 @@ def test_finreg_json_generation_stage(mock_config):
         mock_load.assert_called_once()
         mock_run_inference.assert_called_once()
         mock_save.assert_called_once()
+
+
+def test_pipeline_resume(temp_dir, mock_config):
+    config = mock_config
+    config["pipeline"]["resume"] = True
+    cache_dir = os.path.join(temp_dir, "cache")
+    config["pipeline"]["cache_dir"] = cache_dir
+
+    config_file = os.path.join(temp_dir, "cfg.json")
+    with open(config_file, "w") as f:
+        json.dump(config, f)
+
+    with (
+        patch("yourbench.pipeline.ingestion.run") as mock_ingest,
+        patch("yourbench.pipeline.summarization.run") as mock_sum,
+    ):
+        mock_ingest.return_value = None
+        mock_sum.side_effect = Exception("fail")
+        with pytest.raises(Exception):
+            run_pipeline(config_file)
+        mock_ingest.assert_called_once()
+        mock_sum.assert_called_once()
+
+    with (
+        patch("yourbench.pipeline.ingestion.run") as mock_ingest2,
+        patch("yourbench.pipeline.summarization.run") as mock_sum2,
+    ):
+        mock_ingest2.return_value = None
+        mock_sum2.return_value = None
+        run_pipeline(config_file)
+        mock_ingest2.assert_not_called()
+        mock_sum2.assert_called_once()
