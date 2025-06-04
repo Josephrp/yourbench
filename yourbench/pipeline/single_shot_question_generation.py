@@ -225,9 +225,9 @@ def _build_inference_calls(dataset, stage_config: SingleShotQuestionGenerationCo
 
     for row_index, row in enumerate(dataset):
         doc_row = DocumentRow(
-            document_summary=row.get("document_summary", "No summary available."),
-            document_filename=row.get("document_filename", f"Document_{row_index}"),
-            document_id=row.get("document_id", f"doc_{row_index}"),
+            document_summary=str(row.get("document_summary", "No summary available.")),
+            document_filename=str(row.get("document_filename", f"Document_{row_index}")),
+            document_id=str(row.get("document_id", f"doc_{row_index}")),
             chunks=row.get("chunks", []),
         )
 
@@ -323,9 +323,7 @@ def _process_responses_and_build_dataset(
                     difficulty_val = _force_int_in_range(pair.get("estimated_difficulty", 5), 1, 10)
                     question_type = str(pair.get("question_type", "unknown"))
                     thought_process = str(pair.get("thought_process", ""))
-                    citations = pair.get("citations", [])
-                    if not isinstance(citations, list):
-                        citations = []
+                    citations = _validate_list(pair.get("citations", []))
 
                     if not question_text:
                         logger.debug(f"Empty question found; skipping this QA pair (row_index={row_index}).")
