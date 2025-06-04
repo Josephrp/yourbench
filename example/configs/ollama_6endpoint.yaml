@@ -1,0 +1,43 @@
+hf_configuration:
+  hf_dataset_name: ollama_1000_example
+  private: false
+
+model_list:
+  - model_name: llama3
+    provider: ollama
+    base_url:
+      - http://ollama1.local:11434/v1
+      - http://ollama2.local:11434/v1
+      - http://ollama3.local:11434/v1
+      - http://ollama4.local:11434/v1
+      - http://ollama5.local:11434/v1
+      - http://ollama6.local:11434/v1
+    max_concurrent_requests: 4
+
+model_roles:
+  single_shot_question_generation:
+    - llama3
+
+pipeline:
+  resume: true
+  cache_dir: pipeline_cache
+  reset_cache: false
+  ingestion:
+    source_documents_dir: example/data/raw
+    output_dir: example/data/processed
+  upload_ingest_to_hub:
+  summarization:
+  chunking:
+  single_shot_question_generation:
+    run: true
+    additional_instructions: |
+      Generate a single, self-contained question and answer from each text chunk.
+      Questions should probe moderate-level understanding and include direct
+      citations from the source when possible. Avoid trivial or extremely
+      difficult questions.
+    chunk_sampling:
+      mode: count
+      value: 1000
+  multi_hop_question_generation:
+  lighteval:
+  citation_score_filtering:
