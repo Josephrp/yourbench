@@ -143,7 +143,7 @@ model_list:
   # OpenAI model
   - model_name: gpt-4o
     provider: null  # Set to null for OpenAI API
-    base_url: "https://api.openai.com/v1"  # Default OpenAI API URL
+    base_url: ["https://api.openai.com/v1", "https://api2.openai.com/v1"]  # Multiple endpoints
     api_key: $OPENAI_API_KEY
     max_concurrent_requests: 10
 
@@ -184,9 +184,9 @@ For each model in the list, you can specify:
   - **Description**: The API key for accessing the model, typically stored as an environment variable.
 
 - **`base_url`**  
-  - **Type**: String  
-  - **Optional**: Yes  
-  - **Description**: The base URL for the API endpoint. Use this to specify custom endpoints for OpenAI-compatible APIs or local inference servers.
+  - **Type**: String or List of Strings
+  - **Optional**: Yes
+  - **Description**: The base URL for the API endpoint. Provide a list of URLs to distribute requests across multiple endpoints in parallel.
 
 - **`max_concurrent_requests`**  
   - **Type**: Integer  
@@ -200,7 +200,7 @@ Configuring a mix of remote and local models:
 model_list:
   - model_name: gpt-4o
     provider: null
-    base_url: "https://api.openai.com/v1"
+    base_url: ["https://api.openai.com/v1", "https://api2.openai.com/v1"]
     api_key: $OPENAI_API_KEY
     max_concurrent_requests: 10
   

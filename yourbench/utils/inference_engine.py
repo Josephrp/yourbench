@@ -10,8 +10,9 @@ import atexit
 import asyncio
 import datetime
 import collections
+import dataclasses
 from typing import Any, Dict, List, Optional
-from dataclasses import field, dataclass
+from dataclasses import dataclass, field
 
 import tiktoken
 from dotenv import load_dotenv
@@ -39,7 +40,8 @@ class Model:
     model_name: str
     # You can find the list of available providers here: https://huggingface.co/docs/huggingface_hub/guides/inference#supported-providers-and-tasks
     provider: str | None = None
-    base_url: str | None = None
+    # Can be a single URL or a list for parallel endpoints
+    base_url: str | list[str] | None = None
     api_key: str | None = field(default=None, repr=False)
     bill_to: str | None = None
     max_concurrent_requests: int = 16
@@ -48,6 +50,9 @@ class Model:
     def __post_init__(self):
         if self.api_key is None:
             self.api_key = os.getenv("HF_TOKEN", None)
+        if isinstance(self.base_url, list) and len(self.base_url) == 1:
+            # Simplify single-item lists for ease of use later
+            self.base_url = self.base_url[0]
         if self.provider == "ollama" and self.base_url is None:
             # Default base URL for local Ollama server
             self.base_url = "http://localhost:11434/v1"
@@ -334,25 +339,31 @@ async def _run_inference_async_helper(
     logger.info("Starting asynchronous inference with per-model concurrency control.")
 
     # Instead of a single global concurrency, create a semaphore per model based on model.max_concurrent_requests
-    model_semaphores: Dict[str, asyncio.Semaphore] = {}
+    model_semaphores: Dict[str, List[asyncio.Semaphore]] = {}
     for model in models:
-        # If not specified, default to something reasonable like 1
-        concurrency = max(model.max_concurrent_requests, 1)
-        semaphore = asyncio.Semaphore(concurrency)
-        model_semaphores[model.model_name] = semaphore
+        endpoints = model.base_url if isinstance(model.base_url, list) else [model.base_url]
+        semaphores = []
+        for _ in endpoints:
+            concurrency = max(model.max_concurrent_requests, 1)
+            semaphores.append(asyncio.Semaphore(concurrency))
+        model_semaphores[model.model_name] = semaphores
         logger.debug(
-            "Created semaphore for model='{}' with concurrency={}",
+            "Created %d semaphore(s) for model='%s' with concurrency=%d",
+            len(semaphores),
             model.model_name,
-            concurrency,
+            model.max_concurrent_requests,
         )
 
     tasks = []
-    # We'll build tasks in an order that ensures each model gets a contiguous
-    # slice in the final results.
+    # Build tasks assigning calls round-robin across any provided endpoints
     for model in models:
-        semaphore = model_semaphores[model.model_name]
-        for call in inference_calls:
-            tasks.append(_retry_with_backoff(model, call, semaphore))
+        endpoints = model.base_url if isinstance(model.base_url, list) else [model.base_url]
+        semaphores = model_semaphores[model.model_name]
+        for idx, call in enumerate(inference_calls):
+            endpoint_idx = idx % len(endpoints)
+            call_model = dataclasses.replace(model, base_url=endpoints[endpoint_idx])
+            semaphore = semaphores[endpoint_idx]
+            tasks.append(_retry_with_backoff(call_model, call, semaphore))
 
     logger.info(
         "Total tasks scheduled: {}  (models={}  x  calls={})",
@@ -410,8 +421,15 @@ def _load_models(base_config: Dict[str, Any], step_name: str) -> List[Model]:
     matched = []
     for m_config in all_configured_models:
         if m_config["model_name"] in role_models:
-            model_instance = Model(**{**m_config, "encoding_name": m_config.get("encoding_name", "cl100k_base")})
-            matched.append(model_instance)
+            base_url = m_config.get("base_url")
+            if isinstance(base_url, list):
+                for endpoint in base_url:
+                    m_copy = {**m_config, "base_url": endpoint}
+                    model_instance = Model(**{**m_copy, "encoding_name": m_config.get("encoding_name", "cl100k_base")})
+                    matched.append(model_instance)
+            else:
+                model_instance = Model(**{**m_config, "encoding_name": m_config.get("encoding_name", "cl100k_base")})
+                matched.append(model_instance)
 
     logger.info(
         "Found {} models in config for step '{}': {}",
