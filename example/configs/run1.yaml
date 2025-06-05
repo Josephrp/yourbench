@@ -1,5 +1,5 @@
 hf_configuration:
-  hf_dataset_name: finreg_dataset_gemma3_27b_it_qat
+  hf_dataset_name: finreg_esma_simple
   private: false
   hf_organization: $HF_ORGANIZATION
   token: $HF_TOKEN
@@ -44,7 +44,7 @@ pipeline:
   chunking:
     run: true
     chunking_configuration:
-      l_max_tokens: 2048
+      l_max_tokens: 1024
 
   finreg_code_generation:
     run: true
@@ -67,3 +67,8 @@ pipeline:
 
   citation_score_filtering:
     run: true
+
+  finreg_code_generation:
+    run: true
+  
+  

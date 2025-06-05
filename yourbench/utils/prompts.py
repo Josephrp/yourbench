@@ -17,25 +17,25 @@ SUMMARIZATION_USER_PROMPT = """You are an AI assistant tasked with analyzing and
 - Main topic: [Note the main subject of the document]
 - Key points: [List important information across the entire document]
 - Structure: [Note how the document is organized or chunked]
-- Potential artifacts to ignore: [List any web-related elements that should be disregarded]
+- Potential artifacts to focus on: [List any web-related or code elements that should be disregarded]
 </scratchpad>
 
 4. As you analyze the document:
-   - Focus solely on the content, ignoring any unnecessary web-related elements.
+   - translate the content into python code or json
    - Treat all sections or chunks as part of a single, continuous document.
    - Identify the main topic and key points from the entire input.
    - Pay attention to the overall structure and flow of the document.
 
-5. After your analysis, generate a final summary that:
-   - Captures the essence of the document in a concise manner.
-   - Includes the main topic and key points.
+5. After your analysis, generate a final python or json code block that:
+   - Captures the essence of the document in python code or json.
+   - Includes all the main elements and key parameters.
    - Presents information in a logical and coherent order.
-   - Is comprehensive yet concise, typically ranging from 3-5 sentences (unless the document is particularly long or complex).
+   - Is comprehensive .
 
 6. Enclose your final summary within <final_summary> tags. For example:
 
 <final_summary>
-[Your concise and comprehensive summary of the document goes here.]
+[Your comprehensive code block goes here.]
 </final_summary>
 
 Remember, your task is to provide a clear, accurate, and concise summary of the document's content, disregarding any web-related artifacts or unnecessary elements. For long documents, ensure your summary reflects the complete scope and structure of the content."""
@@ -43,7 +43,7 @@ Remember, your task is to provide a clear, accurate, and concise summary of the 
 
 QUESTION_GENERATION_SYSTEM_PROMPT_HEADER = """## Your Role
 
-You are an expert educational content creator specializing in crafting thoughtful, rich, and engaging questions based on provided textual information. Your goal is to produce meaningful, moderately challenging question-answer pairs that encourage reflection, insight, and nuanced understanding, tailored specifically according to provided instructions.
+You are an expert educational content creator specializing in crafting thoughtful, rich, and engaging python or json code questions based on provided textual or xml information. Your goal is to produce meaningful, moderately challenging question-answer pairs that encourage reflection, insight, and nuanced understanding, tailored specifically according to provided instructions.
 
 ## Input Structure
 
@@ -67,7 +67,7 @@ Your input consists of:
 
 ## Primary Objective
 
-Your goal is to generate a thoughtful set of question-answer pairs from a single provided `<text_chunk>`. Aim for moderate complexity that encourages learners to deeply engage with the content, critically reflect on implications, and clearly demonstrate their understanding.
+Your goal is to generate a thoughtful set of question-answer pairs from a single provided `<text_chunk>`. Aim for professional complexity that encourages learners to deeply engage with the content, critically reflect on implications, and clearly demonstrate their understanding.
 
 ### Context Fields:
 
@@ -87,7 +87,7 @@ Conduct careful analysis within `<document_analysis>` XML tags, following these 
    - Consider implicit assumptions, subtle details, underlying theories, and potential applications of the provided information.
 
 3. **Strategic Complexity Calibration**
-   - Thoughtfully rate difficulty (1-10), ensuring moderate complexity aligned with the additional instructions provided.
+   - Thoughtfully rate difficulty (1-10), ensuring complexity aligned with the additional instructions provided.
 
 4. **Intentional Question Planning**
    - Plan how questions can invite deeper understanding, meaningful reflection, or critical engagement, ensuring each question is purposeful.
@@ -118,42 +118,55 @@ Conduct careful analysis within `<document_analysis>` XML tags, following these 
 - **Moderate Complexity**: Develop questions that challenge learners appropriately without overwhelming them, following the provided additional instructions.
 - **Self-contained Clarity**: Questions and answers should contain sufficient context, clearly understandable independently of external references.
 - **Educational Impact**: Ensure clear pedagogical value, reflecting meaningful objectives and genuine content comprehension.
-- **Conversational Tone**: Formulate engaging, natural, and realistic questions appropriate to the instructional guidelines.
+- **Python or Json Code**: Formulate engaging, natural, and realistic questions appropriate to generating compliant python or json code answers.
 
 ### Permitted Question Types:
 
 - Analytical
 - Application-based
-- Clarification
-- Counterfactual
-- Conceptual
-- True-False
-- Factual
-- Open-ended
-- False-premise
-- Edge-case
+- Clarification (Coding Context)
+- Counterfactual (Code Simulation)
+- Conceptual (Code Explanation)
+- True-False (Code Verification)
+- Factual (Code Representation)
+- Open-ended (Solution Design)
+- False-premise (Debugging Misinterpretation)
+- Edge-case (Regulatory Boundary Handling)
 
 (You do not need to use every question type, only those naturally fitting the content and instructions.)"""
 
 QUESTION_GENERATION_SYSTEM_PROMPT_OUTPUT = """## Output Structure
 
-Present your final output as JSON objects strictly adhering to this Pydantic model within `<output_json>` XML tags:
+All output must be structured as **JSON objects** enclosed within `<output_json>` XML tags, strictly conforming to the following Pydantic model. Focus on creating questions that require **Python or JSON code** as answers, in the context of **financial regulation information systems**, ensuring moderate complexity, pedagogical value, and technical clarity.
 
 ```python
 class QuestionAnswerPair(BaseModel):
-    thought_process: str # Clear, detailed rationale for selecting question and analysis approach
-    question_type: Literal["analytical", "application-based", "clarification",
-                           "counterfactual", "conceptual", "true-false",
-                           "factual", "open-ended", "false-premise", "edge-case"]
-    question: str
-    answer: str
-    estimated_difficulty: int  # 1-10, calibrated according to additional instructions
-    citations: List[str]  # Direct quotes from the text_chunk supporting the answer
-```
+    thought_process: str  # Clear, domain-aware rationale for choosing this question type, why it fits the regulation theme, and the reasoning behind the answer design
+    question_type: Literal[
+        "analytical",         # Analyze financial datasets or rules using code
+        "application-based",  # Apply regulatory concepts in code (e.g., KYC rule enforcement)
+        "clarification",      # Clarify ambiguous rules via Python or JSON implementation
+        "counterfactual",     # Modify code under hypothetical regulation scenarios
+        "conceptual",         # Explain regulatory ideas through structured code
+        "true-false",         # Validate correctness of rule-based code logic
+        "factual",            # Encode known standards or requirements into code structures
+        "open-ended",         # Design broad code-based solutions for regulatory challenges
+        "false-premise",      # Identify flawed assumptions in rule-based code
+        "edge-case"           # Handle regulatory exceptions or outliers with robust code
+    ]
+    question: str  # Self-contained, code-oriented question grounded in financial compliance
+    answer: str    # Python or JSON code block with explanatory comments, accurate and relevant to regulatory systems
+    estimated_difficulty: int  # 1–10 scale reflecting complexity of the code and domain-specific reasoning required
+    citations: List[str]  # Verbatim quotes from the source document supporting the rule, logic, or context used in the question
+````
 
 ## Output Format
 
-Begin by thoughtfully analyzing the provided text_chunk within `<document_analysis>` XML tags. Then present the resulting JSON-formatted QuestionAnswerPairs clearly within `<output_json>` XML tags."""
+1. Begin by analyzing the **provided text\_chunk** thoroughly within `<document_analysis>` XML tags. Highlight relevant financial regulations, data structures, compliance logic, or risk scenarios that can be translated into Python/JSON code tasks.
+
+2. Then, generate and present **one or more JSON-formatted QuestionAnswerPairs** based on that analysis, enclosed within `<output_json>` XML tags.
+
+Your responses must be domain-relevant, educationally impactful, and realistic for professionals or learners working with financial regulatory systems through code."""
 
 QUESTION_GENERATION_SYSTEM_PROMPT_OUTPUT_MULTI = """## Output Structure
 
@@ -179,39 +192,42 @@ Begin by thoughtfully analyzing the provided <text_chunk> within <document_analy
 Then present the resulting multiple-choice questions as valid JSON objects within <output_json> tags, strictly following this structure:
 
 <document_analysis>
-- Key concept: ...
-- Important facts: ...
-- Reasoning opportunities: ...
+- Key regulatory concept: Clearly identify the central regulation or compliance theme (e.g., AML triggers, KYC validation).
+- Relevant technical patterns: Mention applicable data types, Python constructs, or JSON schema mechanics.
+- Reasoning opportunities: Highlight chances to test edge cases, regulatory interpretation, or subtle coding logic.
 </document_analysis>
 
 <output_json>
 [
   {
-    "thought_process": "This question targets understanding of how the chunk explains the purpose of semantic chunking in document processing. Distractors are phrased using near-synonyms or subtle distortions of the true concept.",
-    "question_type": "conceptual",
-    "question": "What is the primary reason for using semantic chunking in document preprocessing?",
+    "thought_process": "Explain the logic behind crafting the question, including the regulatory nuance or coding complexity being targeted. Highlight how distractors are based on real misunderstandings of financial rules or implementation.",
+    "question_type": "application-based",  // Options: conceptual, application-based, factual, true-false, edge-case, etc.
+    "question": "Write a Python function that flags transactions above $10,000 unless they are marked as 'exempt' under CTR rules. Which implementation meets this requirement?",
     "choices": [
-      "(A) To compress the document into fewer tokens.",
-      "(B) To group content based on semantic similarity and token limits.",
-      "(C) To translate the text into multiple languages.",
-      "(D) To strip metadata and formatting from the input file."
+      "(A) def flag(tx): return tx['amount'] > 10000",
+      "(B) def flag(tx): return tx['amount'] > 10000 and tx['type'] != 'exempt'",
+      "(C) def flag(tx): return tx['amount'] <= 10000 or tx['type'] == 'exempt'",
+      "(D) def flag(tx): return tx['amount'] > 10000 or tx['type'] == 'exempt'"
     ],
     "answer": "B",
-    "estimated_difficulty": 6,
-    "citations": ["Semantic chunking partitions documents into coherent segments based on semantic similarity and token length constraints."]
-  },
-  ...
+    "estimated_difficulty": 7,
+    "citations": [
+      "Currency Transaction Reports (CTR) are required for transactions over $10,000 unless exempted. Code logic must filter based on amount and exemption status."
+    ]
+  }
 ]
-</output_json>"""
-
-QUESTION_GENERATION_SYSTEM_PROMPT_FOOTER = """## Important Notes
-- Strive to generate questions that inspire genuine curiosity, reflection, and thoughtful engagement.
-- Maintain clear, direct, and accurate citations drawn verbatim from the provided text_chunk.
-- Ensure complexity and depth reflect thoughtful moderation as guided by the additional instructions.
-- Each "thought_process" should reflect careful consideration and reasoning behind your question selection.
-- Ensure rigorous adherence to JSON formatting and the provided Pydantic validation model.
-- When generating questions, NEVER include phrases like 'as per the text,' 'according to the document,' or any similar explicit references. Questions should inherently integrate content naturally and stand independently without explicit references to the source material
+</output_json>
 """
+
+QUESTION_GENERATION_SYSTEM_PROMPT_FOOTER = """## Important Notes for Code-Based Question Generation 
+
+* **Inspire Depth and Engagement**: Craft questions that spark genuine inquiry, critical thinking, or practical problem-solving within financial regulation contexts.
+* **Ensure Embedded Contextual Clarity**: Questions must be fully self-contained—structured to make sense independently, with relevant concepts naturally embedded.
+* **Reflect Moderate and Meaningful Complexity**: Aim for questions that challenge comprehension or implementation appropriately, especially within compliance, data validation, or rule-based logic scenarios.
+* **Cite Content Implicitly Through Code Logic**: Do not use overt references like “from the text” or “as per the document.” Instead, encode regulatory logic or constraints directly into the scenario or coding prompt.
+* **Thought Process Must Be Rigorous and Purposeful**: Each `thought_process` entry should justify why the question is pedagogically valuable, explaining the regulatory or computational concept it helps to uncover or apply.
+* **Strictly Follow Output Structure and Format**: All questions and answers must adhere precisely to the required JSON format, conforming to the defined Pydantic validation model.
+* **Realism and Relevance in Coding**: Prioritize practical, regulation-aware use cases. Code prompts should be realistic, policy-grounded, and executable in a regulatory or audit-focused system environment."""
 
 QUESTION_GENERATION_SYSTEM_PROMPT = (
     QUESTION_GENERATION_SYSTEM_PROMPT_HEADER
@@ -243,105 +259,155 @@ QUESTION_GENERATION_USER_PROMPT = """<title>
 
 MULTI_HOP_QUESTION_GENERATION_SYSTEM_HEADER = """## Your Role
 
-You are an expert educational content creator specialized in generating insightful and thoughtfully designed multi-hop questions. Your task is to craft sophisticated, moderately challenging questions that inherently require careful, integrative reasoning over multiple chunks of textual information. Aim to provoke thoughtful reflection, nuanced understanding, and synthesis, particularly when the provided text allows for it.
+You are an expert educational content creator specializing in generating insightful, moderately challenging, and integrative **multi-hop questions that elicit Python or JSON code** as answers. Your goal is to craft questions that require learners to synthesize multiple information chunks to **design, analyze, or implement regulatory logic, financial data validations, or compliance mechanisms** through code.
 
 ## Input Structure
 
 Your input will consist of these components:
 
-<additional_instructions>
-[Specific guidelines, preferences, or constraints influencing question generation.]
-</additional_instructions>
+\<additional\_instructions>
+\[Specific coding-related guidelines, such as JSON schema preferences, regulatory frameworks (e.g., KYC, AML), or functional requirements for code outputs.]
+\</additional\_instructions>
 
-<title>
-[Document title]
+<title>  
+[Document title—often regulatory specification, financial compliance documentation, or API/data model definition.]  
 </title>
 
-<document_summary>
-[A concise summary providing context and thematic overview.]
-</document_summary>
+\<document\_summary>
+\[A concise summary providing high-level context, such as the scope of regulatory coverage, core use case (e.g., customer screening, transaction monitoring), and data governance implications.]
+\</document\_summary>
 
-<text_chunks>
-<text_chunk_0>
-[First text segment]
-</text_chunk_0>
-<text_chunk_1>
-[Second text segment]
-</text_chunk_1>
-[Additional text segments as necessary]
-</text_chunks>
+\<text\_chunks>
+\<text\_chunk\_0>
+\[First relevant regulatory, structural, or logical text segment.]
+\</text\_chunk\_0>
+\<text\_chunk\_1>
+\[Second text segment—could include legal interpretation, data schema, business rule, or compliance instruction.]
+\</text\_chunk\_1>
+\[Additional text segments as necessary.]
+\</text\_chunks>
+
+---
 
 ## Primary Objective
 
-Generate a thoughtful, educationally meaningful set of multi-hop question-answer pairs. Questions should ideally integrate concepts across multiple text chunks, challenging learners moderately and encouraging critical thinking and deeper understanding.
+Generate a thoughtful, educationally meaningful set of **multi-hop coding question-answer pairs**. Each question should challenge learners to **synthesize** across text chunks and respond with relevant **Python or JSON code** that accurately reflects financial regulatory logic, system behavior, or policy constraints.
+
+---
 
 ### Context Fields:
-- `<title>`: Document context
-- `<document_summary>`: Broad contextual summary for orientation
-- `<text_chunks>`: Source material to form integrative multi-hop questions
-- `<additional_instructions>`: Specific instructions guiding the complexity and depth of questions
+
+* `<title>`: Thematic and regulatory orientation.
+* `<document_summary>`: High-level contextual synthesis.
+* `<text_chunks>`: Regulatory text, data schemas, business logic, and legal interpretations.
+* `<additional_instructions>`: Any constraints, expectations, or focus areas related to coding or compliance complexity.
+
+---
 
 ## Analysis Phase
 
-Perform careful analysis within `<document_analysis>` XML tags:
+Wrap your reasoning in `<document_analysis>` XML tags:
 
-1. **In-depth Text Analysis**
-   - Thoughtfully read each text chunk.
-   - Identify key themes, nuanced details, and subtle connections.
-   - Highlight opportunities for insightful synthesis across multiple chunks.
+### 1. **In-depth Text Analysis**
 
-2. **Reasoning Path Construction**
-   - Construct potential pathways of multi-hop reasoning by connecting ideas, details, or implications found across text chunks.
+* Carefully read and interpret each chunk for legal definitions, data elements, rules, thresholds, exceptions, and processing logic.
+* Identify intersections between regulation and data—e.g., where legal compliance implies schema constraints, business rule execution, or data transformation.
+* Highlight any opportunities for modeling regulatory requirements using **JSON schema**, **Python functions**, **conditional logic**, or **validation pipelines**.
 
-3. **Complexity Calibration**
-   - Rate difficulty thoughtfully on a scale of 1-10, moderately challenging learners according to provided additional instructions.
+### 2. **Reasoning Path Construction**
 
-4. **Strategic Question Selection**
-   - Choose questions that naturally emerge from the depth and complexity of the content provided, prioritizing integrative reasoning and genuine curiosity.
+* Build reasoning chains that require moving across legal rules, schema design, and operational constraints.
+* Model connections such as:
+
+  * Rule interpretation → Data structure design (JSON)
+  * Legal threshold → Transaction flagging logic (Python)
+  * Exception conditions → Conditional branching in code
+
+### 3. **Complexity Calibration**
+
+* Assign difficulty on a 1–10 scale.
+* Ensure challenges are moderately complex and demand applied, critical thinking—not rote recall.
+* Aim for 5–7 range for balanced complexity unless instructions suggest otherwise.
+
+### 4. **Strategic Question Selection**
+
+* Prioritize questions where learners:
+
+  * Encode rules as JSON or Python
+  * Validate structured data
+  * Simulate or implement logic for compliance monitoring
+  * Clarify or correct false assumptions in regulatory modeling
+* Ensure multi-hop reasoning and meaningful integration across chunks.
+
+---
 
 ## Question Generation Guidelines
 
 ### Question Characteristics
-- **Multi-Hop Integration**: Questions should naturally require integration across multiple chunks, demonstrating clear interconnected reasoning.
-- **Thoughtfulness & Complexity**: Construct questions that stimulate critical thinking, reflection, or moderate challenge appropriate to the content.
-- **Clarity & Precision**: Ensure each question and answer clearly and concisely communicates intent without ambiguity.
-- **Educational Relevance**: Ensure each question has clear pedagogical purpose, enhancing understanding or critical reflection.
-- **Authentic Language**: Use engaging, conversational language reflecting genuine human curiosity and inquiry.
 
-### Suggested Question Types
-(Use naturally, as fitting to the content complexity)
-- Analytical
-- Application-based
-- Clarification
-- Counterfactual
-- Conceptual
-- True-False
-- Factual
-- Open-ended
-- False-premise
-- Edge-case
+* **Multi-Hop Integration**: Each question must require integration of information across at least two distinct chunks—data structure + legal rule, exception + workflow logic, etc.
+* **Code-Oriented Responses**: Answers should be realistic, relevant Python or JSON code reflecting financial or regulatory intent.
+* **Critical Thinking**: Promote active engagement—don’t merely ask to transcribe; encourage interpretation, transformation, or rule implementation.
+* **Clarity & Authenticity**: Use naturally phrased, practical questions that mirror real regulatory programming tasks or compliance implementations.
 
+---
 
-## **Filtering Irrelevant Content**:
-  - **Ignore completely** any irrelevant, redundant, promotional, or unrelated content, including headers, footers, navigation links, promotional materials, ads, or extraneous hyperlinks frequently found in web extracts.
-  - **Disregard entirely** chunks composed solely of such irrelevant content. Do **not** generate questions from these chunks.
-  - When partially relevant content is mixed with irrelevant material within the same chunk, carefully extract only the meaningful, educationally relevant portions for your integrative analysis.
+### Supported Question Types (Reframed for Code)
 
-- **Evaluating Chunk Quality**:
-  - If, upon careful analysis, a chunk does not provide sufficient meaningful context or substantial educational relevance, explicitly note this in the `<document_analysis>` section and refrain from generating questions based on it.
+* **Analytical (Code-Based)**
+  *E.g., “Analyze how the rule on fund origin applies to foreign transactions and write a Python function to detect violations.”*
 
-- **Prioritizing Quality and Relevance**:
-  - Always prioritize the quality, clarity, and educational integrity of generated questions. Do not force questions from unsuitable content."""
+* **Application-Based (Implementation)**
+  *E.g., “Design a JSON schema to enforce mandatory fields for Politically Exposed Person (PEP) declarations.”*
+
+* **Clarification (Logic Modeling)**
+  *E.g., “Clarify how transaction volume limits differ by risk class and implement the policy via Python logic.”*
+
+* **Counterfactual (Conditional Refactoring)**
+  *E.g., “If the high-risk threshold changed to \$7,000, how would you refactor the JSON logic?”*
+
+* **Conceptual (Abstract Modeling)**
+  *E.g., “Use Python classes to represent varying due diligence procedures for onboarding customers.”*
+
+* **True-False (Validation Challenge)**
+  *E.g., “True or False: The following JSON schema enforces annual re-verification of documents. Justify via code.”*
+
+* **Factual (Regulatory Encoding)**
+  *E.g., “Represent the FATF blacklist countries as a JSON array with date tagging.”*
+
+* **Open-Ended (Design-Oriented)**
+  *E.g., “Build a Python module that integrates KYC checks, PEP screening, and AML alerts into one compliance pipeline.”*
+
+* **False-Premise (Debugging/Correction)**
+  *E.g., “This Python snippet assumes domestic transfers are never flagged. Identify and correct the faulty logic.”*
+
+* **Edge-Case (Exception Handling)**
+  *E.g., “Create a Python function to detect if beneficial ownership data is missing for shell entities.”*
+
+---
+
+## Filtering Irrelevant Content
+
+* **Fully exclude** any non-technical or non-regulatory fluff (e.g., marketing text, footers, navigation bars).
+* **Do not generate** questions from metadata-only, promotional, or poorly contextualized chunks.
+* **Extract only educationally relevant content** when mixed with other material in a chunk.
+
+---
+
+## Prioritize Quality & Relevance
+
+Always prefer **deeply connected**, code-generating, and regulation-grounded questions that reflect real-world challenges in financial compliance systems. Avoid trivial code examples or synthetic complexity."""
 
 
 MULTI_HOP_QUESTION_GENERATION_SYSTEM_FOOTER = """## Important Notes
-- Prioritize depth and thoughtfulness in your reasoning paths.
-- Allow natural complexity to guide question formulation, aiming for moderate challenge.
-- Precisely cite verbatim excerpts from text chunks.
-- Clearly communicate your thought process for integrative reasoning.
-- Adhere strictly to JSON formatting and Pydantic validation requirements.
-- Generate questions that genuinely inspire deeper reflection or meaningful exploration of the provided content.
-- When generating questions, NEVER include phrases like 'as per the text,' 'according to the document,' or any similar explicit references. Questions should inherently integrate content naturally and stand independently without explicit references to the source material"""
+
+* **Emphasize Thoughtful Reasoning**: Ensure each question promotes deep analysis or nuanced coding decisions, particularly in regulatory or compliance contexts.
+* **Balance Challenge and Clarity**: Encourage moderate complexity—neither overly simplistic nor unnecessarily intricate—to foster meaningful problem-solving through Python or JSON.
+* **Use Direct Verbatim Integration**: Embed key regulatory or system requirements directly into question logic using precise excerpts. Avoid paraphrasing critical rule expressions.
+* **Showcase Integrative Thinking**: Demonstrate how multiple elements—such as legal thresholds, compliance windows, or transaction flags—interact through structured code logic.
+* **Strict Formatting Compliance**: All answers must adhere to valid `JSON` formatting and `Pydantic` schema validation standards without exception.
+* **No Meta-Referencing**: Do *not* use phrases like “as per the document” or “according to the text.” Each question must stand on its own, with content naturally embedded.
+* **Purpose-Driven Code Context**: Ensure each question has a clear regulatory or financial system relevance—no abstract coding for its own sake."""
 
 MULTI_HOP_QUESTION_GENERATION_SYSTEM_PROMPT = (
     MULTI_HOP_QUESTION_GENERATION_SYSTEM_HEADER
@@ -407,117 +473,57 @@ Enclose your full answer in <answer> XML tags. For example:
 [your answer here]
 </answer>"""
 
-JUDGE_ANSWER_SYSTEM_PROMPT = """You will be provided with the summary of a document, a piece of text, a question generated from that text, and the correct or "gold" answer to the question. Additionally, you will receive two answers: Answer A and Answer B. Your task is to determine which of these answers is closer to the gold answer by assessing the overlap of key points between the ground truth and the two given answers.
-
-# Steps
-
-1. **Document Understanding**:
-   - Analyze the provided document summary to grasp the context and main themes.
-
-2. **Chunk Understanding**:
-   - Examine the provided text (chunk) to understand its content.
-
-3. **Question Understanding**:
-   - Interpret the given question to fully comprehend what is being asked.
-
-4. **Ground Truth Answer Understanding**:
-   - Understand the provided ground truth answer, identifying its key points.
-
-5. **Answer A Understanding**:
-   - Analyze Answer A, identifying key points and assessing accuracy and factuality.
-
-6. **Answer B Understanding**:
-   - Examine Answer B, identifying key points and assessing accuracy and factuality.
-
-7. **Similarity Comparison**:
-   - Compare Answer A and the ground truth answer, noting similarities in key points.
-   - Compare Answer B and the ground truth answer, noting similarities in key points.
-
-8. **Final Similarity Analysis**:
-   - Evaluate both answers based on the similarities identified and determine which is closer to the ground truth in terms of key points and factuality.
-
-# Output Format
-
-- Provide your final evaluation of which answer is closer to the ground truth within `<final_answer>` XML tags.
-- Include a detailed analysis for each part within the designated XML tags: `<document_understanding>`, `<chunk_understanding>`, `<question_understanding>`, `<ground_truth_answer_understanding>`, `<answer_a_understanding>`, `<answer_b_understanding>`, `<similarity_comparison_answer_a>`, `<similarity_comparison_answer_b>`, and `<final_similarity_analysis>`.
-
-# Examples
-
-**Input**:
-```xml
-<document_summary>
-[Summary]
-</document_summary>
-
-<piece_of_text>
-[Text]
-</piece_of_text>
-
-<question>
-[Question]
-</question>
-
-<gold_answer>
-[Gold Answer]
-</gold_answer>
-
-<answer_a>
-[Answer A]
-</answer_a>
-
-<answer_b>
-[Answer B]
-</answer_b>
-```
-**Output**:
-```xml
-
-<document_understanding>
-Understanding of the summary including key themes
+JUDGE_ANSWER_SYSTEM_PROMPT = """<document_understanding>
+Summarize the context, objectives, and main themes of the document, especially in relation to the regulatory or technical implementation described. Highlight if the document involves compliance logic, data structures, automation tasks, or rule-based systems in finance.
 </document_understanding>
 
 <chunk_understanding>
-Analysis of the piece of text
+Analyze the provided text chunk. Identify the logic, regulatory interpretation, or algorithm described. Understand how it supports the broader system, whether it's about validation rules, data flow, flagging logic, or integration points.
 </chunk_understanding>
 
 <question_understanding>
-Comprehension of the question being asked
+Clearly interpret the question. Determine what kind of code response is expected (e.g., function, class, JSON schema, configuration rule), the regulatory logic to be enforced or checked, and whether it targets validation, transformation, alerting, etc.
 </question_understanding>
 
 <ground_truth_answer_understanding>
-Key points from the gold answer
+Break down the gold answer. Identify its key code components, logic correctness, completeness, syntax validity, regulatory adherence, and clarity. Note any specific condition handling, edge case coverage, or compliance rules encoded.
 </ground_truth_answer_understanding>
 
 <answer_a_understanding>
-Key points and accuracy of Answer A
+Analyze Answer A for structural soundness (e.g., valid JSON or Python), correctness of logic against regulatory expectations, adherence to constraints, completeness, and alignment with best practices. Note any errors, omissions, or misinterpretations.
 </answer_a_understanding>
 
 <answer_b_understanding>
-Key points and accuracy of Answer B
+Analyze Answer B similarly—focusing on whether it faithfully implements the regulatory logic, uses correct data structures and syntax, covers all conditions, and avoids logical flaws or incomplete definitions.
 </answer_b_understanding>
 
 <similarity_comparison_answer_a>
-Comparison notes between Answer A and the gold answer
+Compare Answer A to the gold answer on code logic similarity, structural correctness, regulation coverage, and presence of key elements like required fields, conditionals, thresholds, or flags. Note both overlaps and differences.
 </similarity_comparison_answer_a>
 
 <similarity_comparison_answer_b>
-Comparison notes between Answer B and the gold answer
+Compare Answer B to the gold answer using the same criteria: accuracy of code logic, structure, regulatory relevance, and completeness. Identify which core features match or deviate from the gold answer.
 </similarity_comparison_answer_b>
 
 <final_similarity_analysis>
-Overall analysis determining the closer answer
+Evaluate which answer more closely replicates the gold answer in terms of both functional and syntactical fidelity. Consider which answer more comprehensively satisfies the question’s regulatory coding goal and adheres to expected standards.
 </final_similarity_analysis>
 
 <final_answer>
-Answer X (where X is the option you pick)
+Answer X (where X is A or B)
 </final_answer>
+
 ```
 
 # Notes
+    - Always prioritize key implementation points and factual correctness based on regulatory ground truth (e.g., AML, KYC, FATCA).
+    - Rely exclusively on the documented logic, data structures, and regulatory frameworks; avoid assumptions or external biases.
+    - Ensure Python code and JSON structures align with the stated compliance requirements and industry standards.
+    - Enclose all evaluations, justifications, and structured analyses in the specified < > XML tags to support accurate downstream information extraction.
+    - Where applicable, validate all JSON outputs against schema definitions and test Python functions for logical correctness.
+    - Use explicit variable names and include in-code comments when explaining regulatory interpretations or decision logic.
+    - For conditional or rule-based logic, reference the specific regulation being encoded or enforced."""
 
-- Always focus on key points and factual correctness as per the ground truth.
-- Avoid any biases and rely solely on the evidence presented.
-- Enclose all evaluations and analyses in the specified XML tags for clarity and structure."""
 
 JUDGE_ANSWER_USER_PROMPT = """<document_summary>
 {summary}
@@ -541,41 +547,32 @@ JUDGE_ANSWER_USER_PROMPT = """<document_summary>
 
 <answer_b>
 {answer_b}
-</answer_b>"""
+</answer_b>
 
-COMBINE_SUMMARIES_USER_PROMPT = """\
-You will receive a list of chunk-level summaries from the *same* \
-document.  Combine them into a single, well-structured paragraph that reads \
-naturally and eliminates redundancy.
+<evaluation_criteria>
+- Evaluate whether the answers accurately reflect the document content and the regulatory interpretation.
+- Pay special attention to JSON structure or Python code correctness, syntactic validity, and alignment with the described rules.
+- Prioritize answers that follow compliance logic, regulatory intent, and correct parsing or validation methodology.
+- Disregard stylistic differences unless they lead to ambiguity or misinterpretation.
+- Any deviation from the ground truth or regulation should be treated as a significant error.
+</evaluation_criteria>"""
+
+COMBINE_SUMMARIES_USER_PROMPT = """You will receive a list of chunk-level summaries from the *same* document. Your goal is to combine them into a single, well-structured and coherent paragraph.
 
 <chunk_summaries>
 {chunk_summaries}
 </chunk_summaries>
 
-Return ONLY the final text inside <final_summary> tags."""
-
-FINREG_CODE_GEN_PROMPT = """
-You are an expert Python developer and financial regulations analyst. Your task is to read the following regulation text and XML code, and generate Python code that parses, validates, or manipulates the XML models as described in the regulation.
-
-<regulation_text>
-{regulation_text}
-</regulation_text>
-
-<xml_model>
-{xml_code}
-</xml_model>
-
 Instructions:
-- Write Python code that implements the requirements or operations described in the regulation.
-- Use standard libraries (e.g., xml.etree.ElementTree) or any specified libraries.
-- Add comments explaining each major step.
-- If multiple operations are required, structure the code into functions.
+- Eliminate redundancy.
+- Retain essential information only.
+- Ensure smooth flow between ideas and logical cohesion.
 
-Output your code inside <output_code> tags.
+Return ONLY the final text inside <final_summary> tags.
 """
 
-FINREG_JSON_GEN_PROMPT = """
-You are an expert in financial data modeling. Given the following regulation text and XML code, produce a JSON object that captures the required data structure, constraints, or operations as described.
+
+FINREG_CODE_GEN_PROMPT = """You are an expert Python developer and financial regulations analyst. Your task is to read the following regulation text and XML code, and generate Python code that parses, validates, or manipulates the XML models as described in the regulation.
 
 <regulation_text>
 {regulation_text}
@@ -586,9 +583,37 @@ You are an expert in financial data modeling. Given the following regulation tex
 </xml_model>
 
 Instructions:
-- The JSON should reflect the information model, constraints, or mappings required by the regulation.
-- Use clear keys and values, and include nested structures if needed.
-- If the regulation describes operations, encode them as JSON fields or objects.
+- Write Python code that implements the logic, rules, or validation described in the regulation.
+- Use standard libraries (e.g., xml.etree.ElementTree) or any other explicitly mentioned libraries.
+- Add inline comments explaining each major step for interpretability.
+- If multiple operations are required, organize the code into reusable functions or classes.
+- Ensure code reflects accurate regulatory handling (e.g., AML rules, FATCA declarations, KYC checks).
 
-Output your JSON inside <output_json> tags.
+Output your full code inside <output_code> tags."""
+
+FINREG_JSON_GEN_PROMPT = """You are an expert in financial data modeling and compliance automation. Given the following regulation text and its corresponding XML model, generate a structured JSON object that accurately captures the required **data schema, business rules, constraints, or operational logic** implied by the regulation.
+
+<regulation_text>
+{regulation_text}
+</regulation_text>
+
+<xml_model>
+{xml_code}
+</xml_model>
+
+Instructions:
+- Translate the regulatory requirements and XML structure into a comprehensive JSON model.
+- Ensure that the JSON:
+  - Reflects all **entities, attributes, and relationships** present in the XML.
+  - Encodes **constraints** such as required fields, value ranges, enumeration lists, or validation rules.
+  - Represents **business logic or regulatory operations** as embedded rule structures, where applicable.
+- Use meaningful and descriptive keys.
+- Nest objects or arrays as needed to express hierarchical or grouped data accurately.
+- Maintain consistency with domain terminology (e.g., KYC, AML, threshold, jurisdiction, etc.).
+
+Output your final JSON object within the tags below:
+
+<output_json>
+...your JSON output here...
+</output_json>
 """
