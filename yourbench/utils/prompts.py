@@ -38,7 +38,7 @@ SUMMARIZATION_USER_PROMPT = """You are an AI assistant tasked with analyzing and
 [Your comprehensive code block goes here.]
 </final_summary>
 
-Remember, your task is to provide a clear, accurate, and concise summary of the document's content, disregarding any web-related artifacts or unnecessary elements. For long documents, ensure your summary reflects the complete scope and structure of the content."""
+Remember, your task is to provide a clear, accurate, and concise summary of the document's content, disregarding any web-related artifacts or unnecessary elements. For long documents, ensure your summary reflects the complete scope and structure of the content. /no_think"""
 
 
 QUESTION_GENERATION_SYSTEM_PROMPT_HEADER = """## Your Role
@@ -133,7 +133,7 @@ Conduct careful analysis within `<document_analysis>` XML tags, following these 
 - False-premise (Debugging Misinterpretation)
 - Edge-case (Regulatory Boundary Handling)
 
-(You do not need to use every question type, only those naturally fitting the content and instructions.)"""
+(You do not need to use every question type, only those naturally fitting the content and instructions.) /no_think"""
 
 QUESTION_GENERATION_SYSTEM_PROMPT_OUTPUT = """## Output Structure
 
@@ -166,7 +166,7 @@ class QuestionAnswerPair(BaseModel):
 
 2. Then, generate and present **one or more JSON-formatted QuestionAnswerPairs** based on that analysis, enclosed within `<output_json>` XML tags.
 
-Your responses must be domain-relevant, educationally impactful, and realistic for professionals or learners working with financial regulatory systems through code."""
+Your responses must be domain-relevant, educationally impactful, and realistic for professionals or learners working with financial regulatory systems through code. /no_think"""
 
 QUESTION_GENERATION_SYSTEM_PROMPT_OUTPUT_MULTI = """## Output Structure
 
@@ -216,7 +216,7 @@ Then present the resulting multiple-choice questions as valid JSON objects withi
     ]
   }
 ]
-</output_json>
+</output_json> /no_think
 """
 
 QUESTION_GENERATION_SYSTEM_PROMPT_FOOTER = """## Important Notes for Code-Based Question Generation 
@@ -227,7 +227,7 @@ QUESTION_GENERATION_SYSTEM_PROMPT_FOOTER = """## Important Notes for Code-Based 
 * **Cite Content Implicitly Through Code Logic**: Do not use overt references like “from the text” or “as per the document.” Instead, encode regulatory logic or constraints directly into the scenario or coding prompt.
 * **Thought Process Must Be Rigorous and Purposeful**: Each `thought_process` entry should justify why the question is pedagogically valuable, explaining the regulatory or computational concept it helps to uncover or apply.
 * **Strictly Follow Output Structure and Format**: All questions and answers must adhere precisely to the required JSON format, conforming to the defined Pydantic validation model.
-* **Realism and Relevance in Coding**: Prioritize practical, regulation-aware use cases. Code prompts should be realistic, policy-grounded, and executable in a regulatory or audit-focused system environment."""
+* **Realism and Relevance in Coding**: Prioritize practical, regulation-aware use cases. Code prompts should be realistic, policy-grounded, and executable in a regulatory or audit-focused system environment. /no_think"""
 
 QUESTION_GENERATION_SYSTEM_PROMPT = (
     QUESTION_GENERATION_SYSTEM_PROMPT_HEADER
@@ -254,7 +254,7 @@ QUESTION_GENERATION_USER_PROMPT = """<title>
 
 <additional_instructions>
 {additional_instructions}
-</additional_instructions>"""
+</additional_instructions> /no_think"""
 
 
 MULTI_HOP_QUESTION_GENERATION_SYSTEM_HEADER = """## Your Role
@@ -396,7 +396,7 @@ Wrap your reasoning in `<document_analysis>` XML tags:
 
 ## Prioritize Quality & Relevance
 
-Always prefer **deeply connected**, code-generating, and regulation-grounded questions that reflect real-world challenges in financial compliance systems. Avoid trivial code examples or synthetic complexity."""
+Always prefer **deeply connected**, code-generating, and regulation-grounded questions that reflect real-world challenges in financial compliance systems. Avoid trivial code examples or synthetic complexity. /no_think"""
 
 
 MULTI_HOP_QUESTION_GENERATION_SYSTEM_FOOTER = """## Important Notes
@@ -407,7 +407,7 @@ MULTI_HOP_QUESTION_GENERATION_SYSTEM_FOOTER = """## Important Notes
 * **Showcase Integrative Thinking**: Demonstrate how multiple elements—such as legal thresholds, compliance windows, or transaction flags—interact through structured code logic.
 * **Strict Formatting Compliance**: All answers must adhere to valid `JSON` formatting and `Pydantic` schema validation standards without exception.
 * **No Meta-Referencing**: Do *not* use phrases like “as per the document” or “according to the text.” Each question must stand on its own, with content naturally embedded.
-* **Purpose-Driven Code Context**: Ensure each question has a clear regulatory or financial system relevance—no abstract coding for its own sake."""
+* **Purpose-Driven Code Context**: Ensure each question has a clear regulatory or financial system relevance—no abstract coding for its own sake. /no_think"""
 
 MULTI_HOP_QUESTION_GENERATION_SYSTEM_PROMPT = (
     MULTI_HOP_QUESTION_GENERATION_SYSTEM_HEADER
@@ -434,7 +434,7 @@ MULTI_HOP_QUESTION_GENERATION_USER_PROMPT = """<title>
 
 <additional_instructions>
 {additional_instructions}
-</additional_instructions>"""
+</additional_instructions> /no_think"""
 
 
 ZEROSHOT_QA_USER_PROMPT = """Answer the following question:
@@ -447,7 +447,7 @@ Enclose your full answer in <answer> XML tags. For example:
 
 <answer>
 [your answer here]
-</answer>"""
+</answer> /no_think"""
 
 GOLD_QA_USER_PROMPT = """Answer the following question:
 
@@ -471,7 +471,7 @@ Enclose your full answer in <answer> XML tags. For example:
 
 <answer>
 [your answer here]
-</answer>"""
+</answer> /no_think"""
 
 JUDGE_ANSWER_SYSTEM_PROMPT = """<document_understanding>
 Summarize the context, objectives, and main themes of the document, especially in relation to the regulatory or technical implementation described. Highlight if the document involves compliance logic, data structures, automation tasks, or rule-based systems in finance.
@@ -511,8 +511,7 @@ Evaluate which answer more closely replicates the gold answer in terms of both f
 
 <final_answer>
 Answer X (where X is A or B)
-</final_answer>
-
+</final_answer> /no_think
 ```
 
 # Notes
@@ -555,7 +554,7 @@ JUDGE_ANSWER_USER_PROMPT = """<document_summary>
 - Prioritize answers that follow compliance logic, regulatory intent, and correct parsing or validation methodology.
 - Disregard stylistic differences unless they lead to ambiguity or misinterpretation.
 - Any deviation from the ground truth or regulation should be treated as a significant error.
-</evaluation_criteria>"""
+</evaluation_criteria> /no_think"""
 
 COMBINE_SUMMARIES_USER_PROMPT = """You will receive a list of chunk-level summaries from the *same* document. Your goal is to combine them into a single, well-structured and coherent paragraph.
 
@@ -568,7 +567,7 @@ Instructions:
 - Retain essential information only.
 - Ensure smooth flow between ideas and logical cohesion.
 
-Return ONLY the final text inside <final_summary> tags.
+Return ONLY the final text inside <final_summary> tags. /no_think
 """
 
 
@@ -589,7 +588,7 @@ Instructions:
 - If multiple operations are required, organize the code into reusable functions or classes.
 - Ensure code reflects accurate regulatory handling (e.g., AML rules, FATCA declarations, KYC checks).
 
-Output your full code inside <output_code> tags."""
+Output your full code inside <output_code> tags. /no_think"""
 
 FINREG_JSON_GEN_PROMPT = """You are an expert in financial data modeling and compliance automation. Given the following regulation text and its corresponding XML model, generate a structured JSON object that accurately captures the required **data schema, business rules, constraints, or operational logic** implied by the regulation.
 
@@ -615,5 +614,5 @@ Output your final JSON object within the tags below:
 
 <output_json>
 ...your JSON output here...
-</output_json>
+</output_json> /no_think
 """

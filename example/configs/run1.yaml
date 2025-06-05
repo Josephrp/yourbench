@@ -7,7 +7,7 @@ hf_configuration:
 local_dataset_dir: example/data/dataset
 
 model_list:
-  - model_name: gemma3:27b-it-qat
+  - model_name: Qwen3-32B-GGUF:Q8_0
     provider: ollama
     base_url:
       - https://vkif4fef4hfrh8-11434.proxy.runpod.net/
@@ -15,6 +15,12 @@ model_list:
       - https://grhkv4g0idn3pg-11434.proxy.runpod.net/
       - https://5x1cith1tbraqw-11434.proxy.runpod.net/
       - https://mu8do5zijfs20a-11434.proxy.runpod.net/
+      - https://48m5h62swcxj6r-11434.proxy.runpod.net/
+      - https://48m5h62swcxj6r-11434.proxy.runpod.net/
+      - https://48m5h62swcxj6r-11434.proxy.runpod.net/
+      - https://48m5h62swcxj6r-11434.proxy.runpod.net/
+      - https://48m5h62swcxj6r-11434.proxy.runpod.net/
+      - https://48m5h62swcxj6r-11434.proxy.runpod.net/
       - https://48m5h62swcxj6r-11434.proxy.runpod.net/
     api_key: null
     max_concurrent_requests: 4
