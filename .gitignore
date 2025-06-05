@@ -1,6 +1,7 @@
 example/esma_code/
 example/data/
-
+*.json
+*.arrow
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
