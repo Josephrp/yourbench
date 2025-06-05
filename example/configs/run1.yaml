@@ -1,38 +1,45 @@
 hf_configuration:
-  hf_dataset_name: finreg_esma_simple
+  hf_dataset_name: finreg_esma_code
   private: false
   hf_organization: $HF_ORGANIZATION
   token: $HF_TOKEN
 
-local_dataset_dir: example/data/dataset
+local_dataset_dir: example/data/esma_code
 
 model_list:
-  - model_name: Qwen3-32B-GGUF:Q8_0
+  - model_name: hf.co/Qwen/Qwen3-32B-GGUF:Q8_0
     provider: ollama
     base_url:
-      - https://vkif4fef4hfrh8-11434.proxy.runpod.net/
+      - https://48m5h62swcxj6r-11434.proxy.runpod.net/
       - https://rgdky9spmo3g65-11434.proxy.runpod.net/
       - https://grhkv4g0idn3pg-11434.proxy.runpod.net/
       - https://5x1cith1tbraqw-11434.proxy.runpod.net/
       - https://mu8do5zijfs20a-11434.proxy.runpod.net/
-      - https://48m5h62swcxj6r-11434.proxy.runpod.net/
-      - https://48m5h62swcxj6r-11434.proxy.runpod.net/
-      - https://48m5h62swcxj6r-11434.proxy.runpod.net/
-      - https://48m5h62swcxj6r-11434.proxy.runpod.net/
-      - https://48m5h62swcxj6r-11434.proxy.runpod.net/
-      - https://48m5h62swcxj6r-11434.proxy.runpod.net/
-      - https://48m5h62swcxj6r-11434.proxy.runpod.net/
+      - https://u22ym7gvoih0uu-11434.proxy.runpod.net/
+      - https://nbbv2w9399zala-11434.proxy.runpod.net/
+      - https://k2zaxbtasypnr4-11434.proxy.runpod.net/
+      - https://gz9yxy0nu8ld1o-11434.proxy.runpod.net/
+      - https://dnhhkphsud3ghb-11434.proxy.runpod.net/
+      - https://dblak0ik8q41c6-11434.proxy.runpod.net/
+      - https://cy3us31l26re22-11434.proxy.runpod.net/      
+      - https://cm9azlthuj5aou-11434.proxy.runpod.net/
+      - https://9tk5cek5ilvl3z-11434.proxy.runpod.net/
+      - https://9o6mjdvz0xsl2l-11434.proxy.runpod.net/
+      - https://9isw60tqrpynft-11434.proxy.runpod.net/
+      - https://3v1vbnnno1chal-11434.proxy.runpod.net/
+      - https://20nlwaxp3nk99r-11434.proxy.runpod.net/
+      - https://vkif4fef4hfrh8-11434.proxy.runpod.net/
     api_key: null
-    max_concurrent_requests: 4
+    max_concurrent_requests: 1
 
 model_roles:
-  ingestion: [gemma3:27b-it-qat]
-  summarization: [gemma3:27b-it-qat]
-  chunking: [gemma3:27b-it-qat]
-  finreg_code_generation: [gemma3:27b-it-qat]
-  finreg_json_generation: [gemma3:27b-it-qat]
-  single_shot_question_generation: [gemma3:27b-it-qat]
-  multi_hop_question_generation: [gemma3:27b-it-qat]
+  ingestion: [hf.co/Qwen/Qwen3-32B-GGUF:Q8_0]
+  summarization: [hf.co/Qwen/Qwen3-32B-GGUF:Q8_0]
+  chunking: [hf.co/Qwen/Qwen3-32B-GGUF:Q8_0]
+  finreg_code_generation: [hf.co/Qwen/Qwen3-32B-GGUF:Q8_0]
+  finreg_json_generation: [hf.co/Qwen/Qwen3-32B-GGUF:Q8_0]
+  single_shot_question_generation: [hf.co/Qwen/Qwen3-32B-GGUF:Q8_0]
+  multi_hop_question_generation: [hf.co/Qwen/Qwen3-32B-GGUF:Q8_0]
 
 pipeline:
   ingestion:
@@ -73,8 +80,4 @@ pipeline:
 
   citation_score_filtering:
     run: true
-
-  finreg_code_generation:
-    run: true
-  
   
