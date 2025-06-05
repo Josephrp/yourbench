@@ -1,0 +1,69 @@
+hf_configuration:
+  hf_dataset_name: finreg_dataset_gemma3_27b_it_qat
+  private: false
+  hf_organization: $HF_ORGANIZATION
+  token: $HF_TOKEN
+
+local_dataset_dir: example/data/dataset
+
+model_list:
+  - model_name: gemma3:27b-it-qat
+    provider: ollama
+    base_url:
+      - https://vkif4fef4hfrh8-11434.proxy.runpod.net/
+      - https://rgdky9spmo3g65-11434.proxy.runpod.net/
+      - https://grhkv4g0idn3pg-11434.proxy.runpod.net/
+      - https://5x1cith1tbraqw-11434.proxy.runpod.net/
+      - https://mu8do5zijfs20a-11434.proxy.runpod.net/
+      - https://48m5h62swcxj6r-11434.proxy.runpod.net/
+    api_key: null
+    max_concurrent_requests: 4
+
+model_roles:
+  ingestion: [gemma3:27b-it-qat]
+  summarization: [gemma3:27b-it-qat]
+  chunking: [gemma3:27b-it-qat]
+  finreg_code_generation: [gemma3:27b-it-qat]
+  finreg_json_generation: [gemma3:27b-it-qat]
+  single_shot_question_generation: [gemma3:27b-it-qat]
+  multi_hop_question_generation: [gemma3:27b-it-qat]
+
+pipeline:
+  ingestion:
+    run: true
+    source_documents_dir: .\example\data\raw
+    output_dir: .\example\data\processed
+
+  upload_ingest_to_hub:
+    run: true
+    source_documents_dir: example/data/processed
+
+  summarization:
+    run: true
+
+  chunking:
+    run: true
+    chunking_configuration:
+      l_max_tokens: 2048
+
+  finreg_code_generation:
+    run: true
+    source_subset: chunked
+    output_subset: finreg_code
+
+  finreg_json_generation:
+    run: true
+    source_subset: chunked
+    output_subset: finreg_json
+
+  single_shot_question_generation:
+    run: true
+
+  multi_hop_question_generation:
+    run: true
+
+  lighteval:
+    run: true
+
+  citation_score_filtering:
+    run: true
